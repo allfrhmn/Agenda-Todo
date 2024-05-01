@@ -6,22 +6,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.LiveData
+import androidx.hilt.navigation.compose.hiltViewModel
 import id.ac.unpas.ppm.agenda.models.Todo
-import id.ac.unpas.ppm.agenda.persistences.TodoDao
+import kotlinx.coroutines.launch
 
 @Composable
-fun ListTodoScreen(todoDao: TodoDao) {
+fun ListTodoScreen() {
 
-    val _list: LiveData<List<Todo>> = todoDao.loadAll()
-    val list: List<Todo> by _list.observeAsState(listOf())
+    val scope = rememberCoroutineScope()
+    val viewModel = hiltViewModel<TodoViewModel>()
+
+    val list: List<Todo> by viewModel.todos.observeAsState(listOf())
 
     Column(modifier = Modifier.fillMaxWidth()) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(list.size) { index ->
                 val item = list[index]
-                TodoItem(item = item)
+                TodoItem(item = item) {
+                    scope.launch {
+                        viewModel.delete(it)
+                    }
+                }
             }
         }
     }

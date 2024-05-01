@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinKsp)
+    alias(libs.plugins.daggerHilt)
 }
 
 android {
@@ -75,4 +76,9 @@ dependencies {
     implementation(libs.uuid)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.runtime.livedata)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.androidx.compiler)
 }
