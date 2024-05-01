@@ -14,6 +14,9 @@ interface TodoDao {
     @Query("select * from todo")
     fun loadAll(): LiveData<List<Todo>>
 
+    @Query("select * from todo")
+    suspend fun findAll(): List<Todo>
+
     @Query("select * from todo where id = :id")
     fun load(id: String): LiveData<Todo>
 
@@ -22,6 +25,9 @@ interface TodoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(vararg items: Todo)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(list: List<Todo>)
 
     @Query("delete from todo where id = :id")
     suspend fun delete(id: String)

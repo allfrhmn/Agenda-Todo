@@ -57,7 +57,7 @@ fun FormTodoScreen() {
         Row {
             Button(modifier = Modifier.weight(5f), onClick = {
                 scope.launch {
-                    viewModel.upsert(uuid4().toString(), title.value.text, description.value.text, dueDate.value.text)
+                    viewModel.insert(uuid4().toString(), title.value.text, description.value.text, dueDate.value.text)
                 }
             }) {
                 Text(text = "Simpan")
