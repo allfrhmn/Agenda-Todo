@@ -3,7 +3,6 @@ package id.ac.unpas.ppm.agenda.ui.screens
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +19,9 @@ class TodoViewModel @Inject constructor(private val todoRepository: TodoReposito
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _item: MutableLiveData<Todo> = MutableLiveData()
+    val item: LiveData<Todo> = _item
 
     private val _todo: MutableLiveData<Boolean> = MutableLiveData(false)
     val todos : LiveData<List<Todo>> = _todo.switchMap {
@@ -89,5 +91,12 @@ class TodoViewModel @Inject constructor(private val todoRepository: TodoReposito
                 _todo.postValue(true)
             }
         )
+    }
+
+    suspend fun find(id: String) {
+        val todo = todoRepository.find(id)
+        todo?.let {
+            _item.postValue(it)
+        }
     }
 }

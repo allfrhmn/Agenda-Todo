@@ -1,20 +1,26 @@
 package id.ac.unpas.ppm.agenda.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import id.ac.unpas.ppm.agenda.R
 import id.ac.unpas.ppm.agenda.models.Todo
 
 @Composable
-fun TodoItem(item: Todo, onDeleteClick: (String) -> Unit) {
+fun TodoItem(item: Todo, onEditClick: (String) -> Unit, onDeleteClick: (String) -> Unit) {
     Row {
         Text(modifier = Modifier.weight(3f), text = item.title)
         Text(modifier = Modifier.weight(3f), text = item.description)
         Text(modifier = Modifier.weight(3f), text = item.dueDate)
-        Button(modifier = Modifier.weight(3f), onClick = { onDeleteClick(item.id) }) {
-            Text(text = "Delete")
+        Button(modifier = Modifier.weight(1.5f), onClick = { onEditClick(item.id) }) {
+            Image(painterResource(id = R.drawable.baseline_edit_24), contentDescription = "Edit")
+        }
+        Button(modifier = Modifier.weight(1.5f), onClick = { onDeleteClick(item.id) }) {
+            Image(painterResource(id = R.drawable.baseline_delete_24), contentDescription = "Delete")
         }
     }
 }

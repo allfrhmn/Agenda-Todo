@@ -102,4 +102,6 @@ class TodoRepository @Inject constructor(private val api: TodoApi, private val d
                 onError(message())
             }
     }
+
+    suspend fun find(id: String) = dao.find(id)
 }

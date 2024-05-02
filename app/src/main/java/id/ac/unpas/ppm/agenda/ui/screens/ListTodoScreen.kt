@@ -17,7 +17,7 @@ import id.ac.unpas.ppm.agenda.models.Todo
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListTodoScreen() {
+fun ListTodoScreen(modifier: Modifier = Modifier, onClick: (String) -> Unit) {
 
     val scope = rememberCoroutineScope()
     val viewModel = hiltViewModel<TodoViewModel>()
@@ -25,16 +25,18 @@ fun ListTodoScreen() {
     val list: List<Todo> by viewModel.todos.observeAsState(listOf())
     val title = remember { mutableStateOf("TODO") }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(text = title.value, modifier = Modifier.fillMaxWidth())
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(list.size) { index ->
                 val item = list[index]
-                TodoItem(item = item) {
+                TodoItem(item = item, onEditClick = { id ->
+                    onClick(id)
+                }, onDeleteClick = { id ->
                     scope.launch {
-                        viewModel.delete(it)
+                        viewModel.delete(id)
                     }
-                }
+                })
             }
         }
     }
