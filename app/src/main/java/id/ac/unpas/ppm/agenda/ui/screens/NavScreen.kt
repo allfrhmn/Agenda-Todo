@@ -8,4 +8,5 @@ sealed class NavScreen(val route: String) {
         const val argument0 : String = "id"
     }
     object List : NavScreen("list")
+    object Login : NavScreen("login")
 }
