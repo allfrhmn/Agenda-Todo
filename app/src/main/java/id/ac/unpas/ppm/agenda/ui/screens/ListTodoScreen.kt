@@ -14,16 +14,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
 import id.ac.unpas.ppm.agenda.models.Todo
+import id.ac.unpas.ppm.agenda.ui.composables.ConfirmationDialog
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListTodoScreen(modifier: Modifier = Modifier, onClick: (String) -> Unit) {
+fun ListTodoScreen(modifier: Modifier = Modifier, onDelete: () -> Unit, onClick: (String) -> Unit) {
 
     val scope = rememberCoroutineScope()
     val viewModel = hiltViewModel<TodoViewModel>()
 
     val list: List<Todo> by viewModel.todos.observeAsState(listOf())
     val title = remember { mutableStateOf("TODO") }
+
+    val openDialog = remember {
+        mutableStateOf(false)
+    }
+    val activeId = remember {
+        mutableStateOf("")
+    }
+    val deleting = remember {
+        mutableStateOf(false)
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(text = title.value, modifier = Modifier.fillMaxWidth())
@@ -33,11 +44,22 @@ fun ListTodoScreen(modifier: Modifier = Modifier, onClick: (String) -> Unit) {
                 TodoItem(item = item, onEditClick = { id ->
                     onClick(id)
                 }, onDeleteClick = { id ->
-                    scope.launch {
-                        viewModel.delete(id)
-                    }
+                    deleting.value = true
+                    activeId.value = id
+                    openDialog.value = true
                 })
             }
+        }
+    }
+
+    if (openDialog.value) {
+        ConfirmationDialog(onDismiss = {
+            openDialog.value = false
+        }) {
+            scope.launch {
+                viewModel.delete(activeId.value)
+            }
+            openDialog.value = false
         }
     }
 
@@ -46,6 +68,13 @@ fun ListTodoScreen(modifier: Modifier = Modifier, onClick: (String) -> Unit) {
             title.value = "Loading..."
         } else {
             title.value = "TODO"
+        }
+    }
+
+    viewModel.isDeleted.observe(LocalLifecycleOwner.current) {
+        if (deleting.value && it) {
+            deleting.value = false
+            onDelete()
         }
     }
 }

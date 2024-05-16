@@ -23,6 +23,9 @@ class TodoViewModel @Inject constructor(private val todoRepository: TodoReposito
     private val _item: MutableLiveData<Todo> = MutableLiveData()
     val item: LiveData<Todo> = _item
 
+    private val _isDeleted: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isDeleted: LiveData<Boolean> = _isDeleted
+
     private val _todo: MutableLiveData<Boolean> = MutableLiveData(false)
     val todos : LiveData<List<Todo>> = _todo.switchMap {
         _isLoading.postValue(true)
@@ -84,11 +87,13 @@ class TodoViewModel @Inject constructor(private val todoRepository: TodoReposito
                 _isLoading.postValue(false)
                 _isDone.postValue(true)
                 _todo.postValue(true)
+                _isDeleted.postValue(true)
             },
             onError = {
                 _isLoading.postValue(false)
                 _isDone.postValue(true)
                 _todo.postValue(true)
+                _isDeleted.postValue(false)
             }
         )
     }

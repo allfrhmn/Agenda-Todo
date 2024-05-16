@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,6 +24,11 @@ fun LoginScreen(modifier: Modifier = Modifier, onLoginClick: () -> Unit) {
     val password = remember {
         mutableStateOf("")
     }
+
+    val openDialog = remember {
+        mutableStateOf(false)
+    }
+
     Column(modifier = modifier
         .fillMaxWidth()) {
 
@@ -46,7 +52,11 @@ fun LoginScreen(modifier: Modifier = Modifier, onLoginClick: () -> Unit) {
 
             Row {
                 Button(modifier = Modifier.weight(5f), onClick = {
-                    onLoginClick()
+                    if (username.value == "admin" && password.value == "admin") {
+                        onLoginClick()
+                    } else {
+                        openDialog.value = true
+                    }
                 }) {
                     Text(text = "Login")
                 }
@@ -57,6 +67,23 @@ fun LoginScreen(modifier: Modifier = Modifier, onLoginClick: () -> Unit) {
                     Text(text = "Batal")
                 }
             }
+        }
+        if (openDialog.value) {
+            AlertDialog(onDismissRequest = {
+                openDialog.value = false
+            }, confirmButton = {
+                Button(onClick = {
+                    username.value = ""
+                    password.value = ""
+                    openDialog.value = false
+                }) {
+                    Text(text = "OK")
+                }
+            }, title = {
+                Text(text = "Login Gagal")
+            }, text = {
+                Text(text = "Username atau Password salah")
+            })
         }
     }
 }

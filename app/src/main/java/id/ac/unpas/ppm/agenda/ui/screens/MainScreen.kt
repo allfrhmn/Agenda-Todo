@@ -12,12 +12,15 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -28,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import id.ac.unpas.ppm.agenda.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +40,9 @@ fun MainScreen(onExitClick: () -> Unit) {
     val currentRoute = remember {
         mutableStateOf("")
     }
+    val scope = rememberCoroutineScope()
+
+    val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
@@ -83,17 +90,21 @@ fun MainScreen(onExitClick: () -> Unit) {
                             painterResource(id = R.drawable.baseline_add_24),
                             contentDescription = "Tambah",
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
-                            modifier = Modifier.clickable {
-                                navController.navigate(NavScreen.Add.route)
-                            }.weight(0.5f)
+                            modifier = Modifier
+                                .clickable {
+                                    navController.navigate(NavScreen.Add.route)
+                                }
+                                .weight(0.5f)
                         )
                         Image(
                             painterResource(id = R.drawable.baseline_remove_red_eye_24),
                             contentDescription = "Lihat",
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
-                            modifier = Modifier.clickable {
-                                navController.navigate(NavScreen.List.route)
-                            }.weight(0.5f)
+                            modifier = Modifier
+                                .clickable {
+                                    navController.navigate(NavScreen.List.route)
+                                }
+                                .weight(0.5f)
                         )
                     }
                 }
@@ -107,7 +118,10 @@ fun MainScreen(onExitClick: () -> Unit) {
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.End
+        floatingActionButtonPosition = FabPosition.End,
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        }
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = NavScreen.Login.route) {
 
@@ -125,7 +139,12 @@ fun MainScreen(onExitClick: () -> Unit) {
             }
             composable(NavScreen.List.route) {
                 currentRoute.value = NavScreen.List.route
-                ListTodoScreen(modifier = Modifier.padding(innerPadding)) { id ->
+                ListTodoScreen(modifier = Modifier.padding(innerPadding), onDelete = {
+                    scope.launch {
+                        snackBarHostState.showSnackbar("Data telah dihapus", "OK")
+                    }
+
+                }) { id ->
                     navController.navigate("${NavScreen.Edit.route}/$id")
                 }
             }
